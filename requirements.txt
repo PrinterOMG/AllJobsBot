@@ -1,2 +1,5 @@
-aiogram~=2.12
-environs~=8.0.0
+aiogram~=2.14.3
+environs~=9.3.3
+sqlalchemy~=1.4.22
+aiohttp~=3.7.4.post0
+beautifulsoup4~=4.9.3
