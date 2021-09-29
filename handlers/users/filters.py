@@ -8,7 +8,8 @@ from aiogram.dispatcher.filters import Text
 from keyboards.inline import filters, filter_callback, settings
 
 from data.messages import settings_text, filters_text
-from loader import dp, users, session, bot
+from loader import dp, bot
+from utils.db_api import User, session
 
 
 class FiltersInput(StatesGroup):
@@ -28,7 +29,6 @@ async def cancel_handler(message: Message, state: FSMContext):
 
 @dp.message_handler(state=FiltersInput.filters)
 async def get_filters(message: Message, state: FSMContext):
-    user = users[message.chat.id]
     change_object = (await state.get_data("object"))["object"]
     temp_msg_id = (await state.get_data("temp_msg_id"))["temp_msg_id"]
     settings_msg_id = (await state.get_data("settings_msg_id"))["settings_msg_id"]
@@ -36,58 +36,62 @@ async def get_filters(message: Message, state: FSMContext):
     text = message.text
     text = ";".join(map(lambda x: x.strip(), text.split(",")))
 
-    if change_object == "title":
-        user.filters.title = text
+    with session() as s:
+        user = s.query(User).get(message.from_user.id)
 
-    elif change_object == "description":
-        user.filters.description = text
+        if change_object == "title":
+            user.filters.title = text
 
-    elif change_object == "tags":
-        user.filters.tags = text
+        elif change_object == "description":
+            user.filters.description = text
 
-    elif change_object == "all":
-        user.filters.title = text
-        user.filters.description = text
-        user.filters.tags = text
+        elif change_object == "tags":
+            user.filters.tags = text
 
-    await user.filters.check()
+        elif change_object == "all":
+            user.filters.title = text
+            user.filters.description = text
+            user.filters.tags = text
 
-    session.commit()
+        await user.filters.check()
+
+        text = filters_text.format(await user.filters.get_title(), await user.filters.get_description(),
+                                   await user.filters.get_tags())
 
     await state.finish()
 
     await message.delete()
     await asyncio.sleep(0.1)
-    await bot.delete_message(chat_id=user.id, message_id=temp_msg_id)
 
-    text = filters_text.format(await user.filters.get_title(), await user.filters.get_description(),
-                               await user.filters.get_tags())
-    await bot.edit_message_text(chat_id=user.id, message_id=settings_msg_id, text=text, reply_markup=filters)
+    await bot.delete_message(chat_id=message.from_user.id, message_id=temp_msg_id)
+
+    await bot.edit_message_text(chat_id=message.from_user.id, message_id=settings_msg_id, text=text, reply_markup=filters)
 
 
 @dp.callback_query_handler(filter_callback.filter(action="clear"))
 async def clear_filter(call: CallbackQuery, callback_data: dict):
-    user = users[call.from_user.id]
     clear_object = callback_data["object"]
 
-    if clear_object == "all":
-        await user.filters.clear_all()
+    with session() as s:
+        user = s.query(User).get(call.from_user.id)
 
-    else:
-        if clear_object == "title":
-            user.filters.title = ""
-        elif clear_object == "description":
-            user.filters.description = ""
-        elif clear_object == "tags":
-            user.filters.tags = ""
+        if clear_object == "all":
+            await user.filters.clear_all()
 
-        await user.filters.check()
+        else:
+            if clear_object == "title":
+                user.filters.title = ""
+            elif clear_object == "description":
+                user.filters.description = ""
+            elif clear_object == "tags":
+                user.filters.tags = ""
 
-    session.commit()
+            await user.filters.check()
 
-    text = filters_text.format(await user.filters.get_title(), await user.filters.get_description(),
-                               await user.filters.get_tags())
-    await bot.edit_message_text(chat_id=user.id, message_id=call.message.message_id, text=text, reply_markup=filters)
+        text = filters_text.format(await user.filters.get_title(), await user.filters.get_description(),
+                                   await user.filters.get_tags())
+
+    await bot.edit_message_text(chat_id=call.from_user.id, message_id=call.message.message_id, text=text, reply_markup=filters)
 
     await call.answer("Успешно очищено!")
 
@@ -106,9 +110,10 @@ async def change_filter(call: CallbackQuery, callback_data: dict, state: FSMCont
 
 @dp.callback_query_handler(filter_callback.filter(action="back"))
 async def back(call: CallbackQuery):
-    user = users[call.from_user.id]
+    with session() as s:
+        user = s.query(User).get(call.from_user.id)
 
-    text = settings_text.format(await user.get_has_subscribes(), await user.get_has_filters())
+        text = settings_text.format(await user.get_has_subscribes(), await user.get_has_filters())
 
     await call.message.edit_text(text, reply_markup=settings)
     await call.answer()

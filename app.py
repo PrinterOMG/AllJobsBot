@@ -2,6 +2,7 @@ import asyncio
 from aiogram import executor
 import aioschedule
 
+from data.config import PARSING_INTERVAL
 from loader import dp
 import middlewares, filters, handlers
 from utils.notify_admins import on_startup_notify
@@ -9,8 +10,8 @@ from utils.set_bot_commands import set_default_commands
 from utils.send_jobs import send_jobs
 
 
-async def scheduler(interval=10):
-    aioschedule.every(interval).seconds.do(send_jobs)
+async def scheduler():
+    aioschedule.every(PARSING_INTERVAL).seconds.do(send_jobs)
 
     while True:
         await aioschedule.run_pending()
