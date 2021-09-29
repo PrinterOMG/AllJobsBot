@@ -16,7 +16,4 @@ async def bot_start(message: types.Message):
             subscribes = Subscribe().user_id = message.from_user.id
             last_jobs = LastJob().user_id = message.from_user.id
 
-            session.add_all([user, filters, subscribes, last_jobs])
-
-        else:
-            pass
+            s.add_all([user, filters, subscribes, last_jobs])

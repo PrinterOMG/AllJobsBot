@@ -20,14 +20,17 @@ class Filter(Base):
     async def is_job_filtered(self, job):
         for word in self.title.split(";"):
             if word.lower() in job.title.lower().translate(TRANSLATE_TABLE).split():
+                print(word)
                 return True
 
         for word in self.description.split(";"):
             if word.lower() in job.description.lower().translate(TRANSLATE_TABLE).split():
+                print(word)
                 return True
 
         for tag in self.tags.split(";"):
             if tag.lower() in job.tags:
+                print(tag)
                 return True
 
         return False

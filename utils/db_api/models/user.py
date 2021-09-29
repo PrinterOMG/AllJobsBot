@@ -21,7 +21,7 @@ class User(Base):
                 return None
 
             if self.has_filters:
-                if self.filters.is_job_filtered(job):
+                if await self.filters.is_job_filtered(job):
                     self.last_jobs.weblancer_last_job = job.url
                     return job
 
@@ -38,7 +38,7 @@ class User(Base):
             return None
 
         if self.has_filters:
-            if self.filters.is_job_filtered(job):
+            if await self.filters.is_job_filtered(job):
                 self.last_jobs.habr_last_job = job.url
                 return job
 
