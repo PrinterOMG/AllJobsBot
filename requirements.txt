@@ -3,4 +3,4 @@ environs~=9.3.3
 sqlalchemy~=1.4.22
 aiohttp~=3.7.4.post0
 beautifulsoup4~=4.9.3
-aioschedule
+aioschedule~=0.5.2
