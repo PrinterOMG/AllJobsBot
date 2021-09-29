@@ -8,6 +8,9 @@ settings = InlineKeyboardMarkup(
         ],
         [
             InlineKeyboardButton(text="Фильтры", callback_data="filters")
+        ],
+        [
+            InlineKeyboardButton(text="Закрыть", callback_data="close")
         ]
     ]
 )

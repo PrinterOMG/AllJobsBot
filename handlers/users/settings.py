@@ -5,7 +5,7 @@ from keyboards.inline import settings, filters, subscribes
 
 from data.messages import settings_text, filters_text, subscribes_text
 
-from loader import dp
+from loader import dp, bot
 from utils.db_api import User, session
 
 
@@ -17,6 +17,7 @@ async def show_settings(message: Message):
         text = settings_text.format(await user.get_has_subscribes(), await user.get_has_filters())
 
     await message.answer(text, reply_markup=settings)
+    await message.delete()
 
 
 @dp.callback_query_handler(text="filters")
@@ -39,3 +40,8 @@ async def show_subscribes(call: CallbackQuery):
 
     await call.message.edit_text(text, reply_markup=subscribes)
     await call.answer()
+
+
+@dp.callback_query_handler(text="close")
+async def close_settings_message(call: CallbackQuery):
+    await bot.delete_message(chat_id=call.from_user.id, message_id=call.message.message_id)
