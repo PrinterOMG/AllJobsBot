@@ -1,3 +1,8 @@
+import re
+
+import aiohttp
+import lxml
+
 from .parsers_helper import Job
 from .core_parser import Parser
 
@@ -5,16 +10,16 @@ from bs4 import BeautifulSoup
 
 
 class HabrParser(Parser):
-    def __init__(self, session):
-        super().__init__(session)
+    def __init__(self):
 
         self.url = "https://freelance.habr.com/user_rss_tasks/ObKACbYdFK5Jgjnz9KgE8g=="
 
     async def parse_last_job(self) -> Job:
-        response = await self.session.get(self.url)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(self.url) as response:
+                soup = BeautifulSoup(await response.text(), "lxml")
 
-        soup = BeautifulSoup(response.text, "lxml")
-        job = await soup.find("item")
+        job = soup.find("item")
         job = await self._get_job_data(job)
 
         return job
@@ -24,6 +29,7 @@ class HabrParser(Parser):
         url = job.find("guid").text
         date = job.find("pubdate").text
         description = job.find("description").text
+        description = re.sub('<[^<]+?>', '', description)
 
         job = Job(
             title=title,

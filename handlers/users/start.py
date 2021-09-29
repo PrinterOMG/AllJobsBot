@@ -18,6 +18,6 @@ async def bot_start(message: types.Message):
         users[message.chat.id] = user
         session.add_all([user, filters, subscribes, last_jobs])
         session.commit()
-        print("reg")
+
     else:
-        print("already reg")
+        pass

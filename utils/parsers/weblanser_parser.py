@@ -1,16 +1,15 @@
 from bs4 import BeautifulSoup
+import aiohttp
+
 from .parsers_helper import Job
 from .core_parser import Parser
 
 
 class WeblancerParser(Parser):
-    def __init__(self, session):
+    def __init__(self):
         """
         Инициализация класса
-
-        :param session: Сессия библиотеки Requests, через которую будут отправляться запросы
         """
-        super().__init__(session)
 
         self.request_url = "https://www.weblancer.net/jobs/?page={0}"
         self.url = "https://www.weblancer.net"
@@ -27,8 +26,9 @@ class WeblancerParser(Parser):
         for page in range(1, pages_count + 1):
             url = self.request_url.format(page)
 
-            response = await self.session.get(url)
-            soup = BeautifulSoup(response.text, "lxml")
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as response:
+                    soup = BeautifulSoup(await response.text(), "lxml")
 
             jobs = soup.find_all("div", class_="row click_container-link set_href")
 
@@ -56,6 +56,7 @@ class WeblancerParser(Parser):
         title_raw = job.find("a", class_="text-bold click_target show_visited")
         title = title_raw.text
         job_url = self.url + title_raw["href"]
+        # print(job_url)
 
         section = job.find("span", class_="text-nowrap").find("a").text
 

@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine, MetaData, Table, Integer, Text, Column, ForeignKey, Numeric, BigInteger, Boolean, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Session
 
 from data.config import DATABASE_URL, TRANSLATE_TABLE
 
@@ -37,6 +37,23 @@ class User(Base):
                 self.last_jobs.weblancer_last_job = job.url
                 return job
 
+    async def get_new_habr_job(self, job):
+        if job.url == self.last_jobs.habr_last_job:
+            return None
+
+        if self.has_filters:
+            if self.filters.is_job_filtered(job):
+                self.last_jobs.habr_last_job = job.url
+                return job
+
+            else:
+                self.last_jobs.habr_last_job = job.url
+                return None
+
+        else:
+            self.last_jobs.habr_last_job = job.url
+            return job
+
     async def get_has_filters(self):
         if self.has_filters:
             return "Есть"
@@ -48,6 +65,9 @@ class User(Base):
             return "Есть"
 
         return "Нет"
+
+    def __repr__(self):
+        return f"Пользователь {self.id}"
 
 
 class Filter(Base):
@@ -78,15 +98,15 @@ class Filter(Base):
         return False
 
     async def clear_all(self):
-        self.filters.tags = ""
-        self.filters.description = ""
-        self.filters.category = ""
-        self.filters.title = ""
+        self.tags = ""
+        self.description = ""
+        self.category = ""
+        self.title = ""
 
         self.user.has_filters = False
 
     async def check(self):
-        if self.filters.tags or self.filters.title or self.filters.description or self.filters.category:
+        if self.tags or self.title or self.description or self.category:
             self.user.has_filters = True
         else:
             self.user.has_filters = False
@@ -97,14 +117,14 @@ class Filter(Base):
         return ", ".join(title)
 
     async def get_description(self):
-        title = self.title.split(";")
+        description = self.description.split(";")
 
-        return ", ".join(title)
+        return ", ".join(description)
 
     async def get_tags(self):
-        title = self.title.split(";")
+        tags = self.tags.split(";")
 
-        return ", ".join(title)
+        return ", ".join(tags)
 
 
 class Subscribe(Base):

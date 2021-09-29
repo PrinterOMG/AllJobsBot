@@ -3,7 +3,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 from aiohttp import ClientSession
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
 
 from data import config
 from utils.db_api import User, engine
@@ -13,10 +13,8 @@ bot = Bot(token=config.BOT_TOKEN, parse_mode=types.ParseMode.HTML)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
-aiohttp_session = ClientSession()
-
-weblancer_parser = WeblancerParser(aiohttp_session)
-habr_parsers = HabrParser(aiohttp_session)
+weblancer_parser = WeblancerParser()
+habr_parsers = HabrParser()
 
 session = Session(bind=engine)
 

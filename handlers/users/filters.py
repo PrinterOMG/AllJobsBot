@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram.types import CallbackQuery, Message
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
@@ -5,7 +7,8 @@ from aiogram.dispatcher.filters import Text
 
 from keyboards.inline import filters, filter_callback, settings
 
-from loader import dp, users, session
+from data.messages import settings_text, filters_text
+from loader import dp, users, session, bot
 
 
 class FiltersInput(StatesGroup):
@@ -26,7 +29,9 @@ async def cancel_handler(message: Message, state: FSMContext):
 @dp.message_handler(state=FiltersInput.filters)
 async def get_filters(message: Message, state: FSMContext):
     user = users[message.chat.id]
-    change_object = await state.get_state("object")
+    change_object = (await state.get_data("object"))["object"]
+    temp_msg_id = (await state.get_data("temp_msg_id"))["temp_msg_id"]
+    settings_msg_id = (await state.get_data("settings_msg_id"))["settings_msg_id"]
 
     text = message.text
     text = ";".join(map(lambda x: x.strip(), text.split(",")))
@@ -45,31 +50,55 @@ async def get_filters(message: Message, state: FSMContext):
         user.filters.description = text
         user.filters.tags = text
 
+    await user.filters.check()
+
     session.commit()
 
     await state.finish()
 
+    await message.delete()
+    await asyncio.sleep(0.1)
+    await bot.delete_message(chat_id=user.id, message_id=temp_msg_id)
+
+    text = filters_text.format(await user.filters.get_title(), await user.filters.get_description(),
+                               await user.filters.get_tags())
+    await bot.edit_message_text(chat_id=user.id, message_id=settings_msg_id, text=text, reply_markup=filters)
+
 
 @dp.callback_query_handler(filter_callback.filter(action="clear"))
 async def clear_filter(call: CallbackQuery, callback_data: dict):
+    user = users[call.from_user.id]
     clear_object = callback_data["object"]
 
     if clear_object == "all":
-        print("clear all")
+        await user.filters.clear_all()
 
     else:
-        print("clear " + clear_object)
+        if clear_object == "title":
+            user.filters.title = ""
+        elif clear_object == "description":
+            user.filters.description = ""
+        elif clear_object == "tags":
+            user.filters.tags = ""
 
-    await call.answer("test")
+        await user.filters.check()
+
+    session.commit()
+
+    text = filters_text.format(await user.filters.get_title(), await user.filters.get_description(),
+                               await user.filters.get_tags())
+    await bot.edit_message_text(chat_id=user.id, message_id=call.message.message_id, text=text, reply_markup=filters)
+
+    await call.answer("Успешно очищено!")
 
 
 @dp.callback_query_handler(filter_callback.filter(action="change"))
 async def change_filter(call: CallbackQuery, callback_data: dict, state: FSMContext):
     change_object = callback_data["object"]
 
-    await call.message.answer("Введите ключевые слова для фильтров через запятую:")
+    temp_message = await call.message.answer("Введите ключевые слова для фильтров через запятую:")
 
-    await state.update_data(object=change_object)
+    await state.update_data(object=change_object, temp_msg_id=temp_message.message_id, settings_msg_id=call.message.message_id)
     await FiltersInput.filters.set()
 
     await call.answer()
@@ -77,5 +106,9 @@ async def change_filter(call: CallbackQuery, callback_data: dict, state: FSMCont
 
 @dp.callback_query_handler(filter_callback.filter(action="back"))
 async def back(call: CallbackQuery):
-    await call.message.edit_text("Настройки", reply_markup=settings)
+    user = users[call.from_user.id]
+
+    text = settings_text.format(await user.get_has_subscribes(), await user.get_has_filters())
+
+    await call.message.edit_text(text, reply_markup=settings)
     await call.answer()
