@@ -11,6 +11,7 @@ sqlalchemy = "*"
 pymysql = "==1.0.2"
 mysql-connector-python = "==8.0.26"
 beautifulsoup4 = "==4.9.3"
+aioschedule = "==0.5.2"
 
 [dev-packages]
 
