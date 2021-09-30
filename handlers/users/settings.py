@@ -14,7 +14,10 @@ async def show_settings(message: Message):
     with session() as s:
         user = s.query(User).get(message.from_user.id)
 
-        text = settings_text.format(await user.get_has_subscribes(), await user.get_has_filters())
+        if user:
+            text = settings_text.format(await user.get_has_subscribes(), await user.get_has_filters())
+        else:
+            await message.answer("Пожалуйста, напишите /start")
 
     await message.answer(text, reply_markup=settings)
     await message.delete()
