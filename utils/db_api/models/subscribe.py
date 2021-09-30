@@ -31,3 +31,15 @@ class Subscribe(Base):
             return "Есть ✅"
 
         return "Нет ⛔️"
+
+    async def sub_all(self):
+        self.weblancer_subscribe = True
+        self.habr_subscribe = True
+
+        self.user.has_subscribes = True
+
+    async def unsub_all(self):
+        self.weblancer_subscribe = False
+        self.habr_subscribe = False
+
+        self.user.has_subscribes = False

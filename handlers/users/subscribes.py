@@ -1,5 +1,4 @@
-from aiogram.dispatcher.filters import Command
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import CallbackQuery
 
 from keyboards.inline import subscribes, subscribes_callback, settings
 from data.messages import settings_text, subscribes_text
@@ -28,7 +27,7 @@ async def change_weblancer_subscribe(call: CallbackQuery):
         text = subscribes_text.format(await user.subscribes.get_weblancer(), await user.subscribes.get_habr())
 
     await call.message.edit_text(text, reply_markup=subscribes)
-    await call.answer()
+    await call.answer("Успешно")
 
 
 @dp.callback_query_handler(subscribes_callback.filter(object="habr"))
@@ -42,4 +41,30 @@ async def change_habr_subscribe(call: CallbackQuery):
         text = subscribes_text.format(await user.subscribes.get_weblancer(), await user.subscribes.get_habr())
 
     await call.message.edit_text(text, reply_markup=subscribes)
-    await call.answer()
+    await call.answer("Успешно")
+
+
+@dp.callback_query_handler(subscribes_callback.filter(object="sub_all"))
+async def sub_all(call: CallbackQuery):
+    with session() as s:
+        user = s.query(User).get(call.from_user.id)
+
+        user.subscribes.sub_all()
+
+        text = subscribes_text.format(await user.subscribes.get_weblancer(), await user.subscribes.get_habr())
+
+    await call.message.edit_text(text, reply_markup=subscribes)
+    await call.answer("Успешно")
+
+
+@dp.callback_query_handler(subscribes_callback.filter(object="unsub_all"))
+async def sub_all(call: CallbackQuery):
+    with session() as s:
+        user = s.query(User).get(call.from_user.id)
+
+        user.subscribes.unsub_all()
+
+        text = subscribes_text.format(await user.subscribes.get_weblancer(), await user.subscribes.get_habr())
+
+    await call.message.edit_text(text, reply_markup=subscribes)
+    await call.answer("Успешно")
