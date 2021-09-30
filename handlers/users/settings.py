@@ -1,5 +1,5 @@
 from aiogram.dispatcher.filters import Command
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, ParseMode
 
 from keyboards.inline import settings, filters, subscribes
 
@@ -27,7 +27,7 @@ async def show_filters(call: CallbackQuery):
 
         text = filters_text.format(await user.filters.get_title(), await user.filters.get_description(), await user.filters.get_tags())
 
-    await call.message.edit_text(text, reply_markup=filters)
+    await call.message.edit_text(text, reply_markup=filters, parse_mode=ParseMode.MARKDOWN_V2)
     await call.answer()
 
 
