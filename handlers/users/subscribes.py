@@ -49,7 +49,7 @@ async def sub_all(call: CallbackQuery):
     with session() as s:
         user = s.query(User).get(call.from_user.id)
 
-        user.subscribes.sub_all()
+        await user.subscribes.sub_all()
 
         text = subscribes_text.format(await user.subscribes.get_weblancer(), await user.subscribes.get_habr())
 
@@ -62,7 +62,7 @@ async def sub_all(call: CallbackQuery):
     with session() as s:
         user = s.query(User).get(call.from_user.id)
 
-        user.subscribes.unsub_all()
+        await user.subscribes.unsub_all()
 
         text = subscribes_text.format(await user.subscribes.get_weblancer(), await user.subscribes.get_habr())
 
