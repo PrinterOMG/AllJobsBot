@@ -1,6 +1,6 @@
 import asyncio
 
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, ParseMode
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
@@ -65,7 +65,8 @@ async def get_filters(message: Message, state: FSMContext):
 
     await bot.delete_message(chat_id=message.from_user.id, message_id=temp_msg_id)
 
-    await bot.edit_message_text(chat_id=message.from_user.id, message_id=settings_msg_id, text=text, reply_markup=filters)
+    await bot.edit_message_text(chat_id=message.from_user.id, message_id=settings_msg_id, text=text,
+                                reply_markup=filters, parse_mode=ParseMode.MARKDOWN)
 
 
 @dp.callback_query_handler(filter_callback.filter(action="clear"))
