@@ -44,7 +44,7 @@ async def get_filters(message: Message, state: FSMContext):
 
         await user.filters.check()
 
-        text = filters_text.format(await user.filters.get_key_words())
+        text = filters_text.format(await user.filters.get_keywords())
 
     await state.finish()
 
@@ -68,12 +68,15 @@ async def clear_filter(call: CallbackQuery, callback_data: dict):
             user.filters.key_words = ""
             await user.filters.check()
 
-        text = filters_text.format(await user.filters.get_key_words())
+        text = filters_text.format(await user.filters.get_keywords())
 
-    await bot.edit_message_text(chat_id=call.from_user.id, message_id=call.message.message_id, text=text,
-                                reply_markup=filters)
+    try:
+        await bot.edit_message_text(chat_id=call.from_user.id, message_id=call.message.message_id, text=text,
+                                    reply_markup=filters)
 
-    await call.answer("Успешно очищено!")
+        await call.answer("Успешно очищено!")
+    except Exception:
+        await call.answer("Нечего очищать!")
 
 
 @dp.callback_query_handler(filter_callback.filter(action="change"))

@@ -27,7 +27,10 @@ class Filter(Base):
         else:
             self.user.has_filters = False
 
-    async def get_key_words(self):
-        key_words = self.key_words.split(";")
+    async def get_keywords(self):
+        if self.key_words:
+            key_words = self.key_words.split(";")
 
-        return ", ".join(key_words)
+            return ", ".join(key_words)
+        else:
+            return "Не заданы"
