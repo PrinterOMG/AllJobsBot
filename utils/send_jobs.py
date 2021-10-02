@@ -1,12 +1,13 @@
-from loader import weblancer_parser, habr_parsers, bot
+from loader import weblancer_parser, habr_parser, bot
 from data.messages import new_web_job_text, new_habr_job_text
 from data.config import WEBLANCER_PAGES_COUNT
 from utils.db_api import User, session
+from keyboards.inline import update
 
 
 async def send_jobs():
     web_jobs = await weblancer_parser.parse_jobs(WEBLANCER_PAGES_COUNT)
-    habr_job = await habr_parsers.parse_last_job()
+    habr_job = await habr_parser.parse_last_job()
 
     with session() as s:
         users = s.query(User).all()
@@ -20,8 +21,8 @@ async def send_jobs():
                                                    new_web_job.requests_count, new_web_job.time, new_web_job.url)
 
                     try:
-                        await bot.send_message(chat_id=user.id, text=text)
-                    except:
+                        await bot.send_message(chat_id=user.id, text=text, reply_markup=update)
+                    except Exception:
                         continue
 
             if user.subscribes.habr_subscribe:
@@ -29,9 +30,9 @@ async def send_jobs():
 
                 if new_habr_job:
                     text = new_habr_job_text.format(new_habr_job.title, new_habr_job.description, new_habr_job.date,
-                                                    new_habr_job.url)
+                                                    new_habr_job.price, new_habr_job.requests_count, new_habr_job.url)
 
                     try:
-                        await bot.send_message(chat_id=user.id, text=text)
-                    except:
+                        await bot.send_message(chat_id=user.id, text=text, reply_markup=update)
+                    except Exception:
                         continue

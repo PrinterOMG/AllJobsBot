@@ -9,4 +9,4 @@ storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
 weblancer_parser = WeblancerParser()
-habr_parsers = HabrParser()
+habr_parser = HabrParser()

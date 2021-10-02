@@ -19,7 +19,6 @@ class WeblancerParser(Parser):
         Возвращает отфильтрованный список заказов
 
         :param pages_count: Количество страниц для парсинга
-        :param filters: Фильтры для парсинга, по умолчанию None
         :return: Отфильтрованный список заказов
         """
         parsed_jobs = list()
@@ -42,6 +41,43 @@ class WeblancerParser(Parser):
 
         return parsed_jobs
 
+    async def parse_job_from_url(self, job_url) -> Job:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(job_url) as response:
+                soup = BeautifulSoup(await response.text(), "lxml")
+
+        title = soup.find("h1").text
+        title = title[:title.rfind("–") - 1]
+
+        description = soup.find("div", class_="cols_table no_hover").find("p").text.strip()
+
+        time = soup.find("div", class_="float-right text-muted hidden-xs-down").find("span").text
+
+        requests_count = soup.find("div", class_="block-content text_field").find("span").text.lower()
+        if "нет" in requests_count:
+            requests_count = 0
+        else:
+            requests_count = requests_count[:requests_count.find(" ")]
+
+        if price := soup.find("span", class_="title amount"):
+            price = price.text
+        else:
+            price = "Не указана"
+
+        job = Job(
+            title=title,
+            price=price,
+            url=job_url,
+            description=description,
+            category=None,
+            tags=None,
+            time=time,
+            date=None,
+            requests_count=requests_count
+        )
+
+        return job
+
     async def _get_job_data(self, job):
         """
         Возвращает словарь с данными о заказе
@@ -56,7 +92,6 @@ class WeblancerParser(Parser):
         title_raw = job.find("a", class_="text-bold click_target show_visited")
         title = title_raw.text
         job_url = self.url + title_raw["href"]
-        # print(job_url)
 
         section = job.find("span", class_="text-nowrap").find("a").text
 

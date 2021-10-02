@@ -39,24 +39,12 @@ async def get_filters(message: Message, state: FSMContext):
     with session() as s:
         user = s.query(User).get(message.from_user.id)
 
-        if change_object == "title":
-            user.filters.title = text
-
-        elif change_object == "description":
-            user.filters.description = text
-
-        elif change_object == "tags":
-            user.filters.tags = text
-
-        elif change_object == "all":
-            user.filters.title = text
-            user.filters.description = text
-            user.filters.tags = text
+        if change_object == "key_words":
+            user.filters.key_words = text
 
         await user.filters.check()
 
-        text = filters_text.format(await user.filters.get_title(), await user.filters.get_description(),
-                                   await user.filters.get_tags())
+        text = filters_text.format(await user.filters.get_key_words())
 
     await state.finish()
 
@@ -76,23 +64,14 @@ async def clear_filter(call: CallbackQuery, callback_data: dict):
     with session() as s:
         user = s.query(User).get(call.from_user.id)
 
-        if clear_object == "all":
-            await user.filters.clear_all()
-
-        else:
-            if clear_object == "title":
-                user.filters.title = ""
-            elif clear_object == "description":
-                user.filters.description = ""
-            elif clear_object == "tags":
-                user.filters.tags = ""
-
+        if clear_object == "key_words":
+            user.filters.key_words = ""
             await user.filters.check()
 
-        text = filters_text.format(await user.filters.get_title(), await user.filters.get_description(),
-                                   await user.filters.get_tags())
+        text = filters_text.format(await user.filters.get_key_words())
 
-    await bot.edit_message_text(chat_id=call.from_user.id, message_id=call.message.message_id, text=text, reply_markup=filters)
+    await bot.edit_message_text(chat_id=call.from_user.id, message_id=call.message.message_id, text=text,
+                                reply_markup=filters)
 
     await call.answer("Успешно очищено!")
 
