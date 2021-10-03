@@ -56,7 +56,7 @@ new_habr_job_text = """
 filters_text = """
 Ваши фильтры:
 
-Ключевые слова: {0}
+Ключевые слова: `{0}`
 """
 
 subscribes_text = """
