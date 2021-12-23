@@ -12,6 +12,6 @@ DATABASE_URL = env.str("CLEARDB_DATABASE_URL")
 
 TRANSLATE_TABLE = str.maketrans(dict.fromkeys(string.punctuation))
 
-PARSING_INTERVAL = 10  # In seconds
+PARSING_INTERVAL = 20  # In seconds
 
 WEBLANCER_PAGES_COUNT = 4
