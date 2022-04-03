@@ -12,7 +12,7 @@ async def update_job_message(call: CallbackQuery):
 
     if "habr" in job_url:
         job = await habr_parser.parse_job_from_url(job_url)
-        text = new_habr_job_text.format(job.title, job.description, job.date, job.price, job.requests_count, job.url)
+        text = new_habr_job_text.format(job.title, job.price, job.description, job.requests_count, job.date, job.url)
 
     else:
         job = await weblancer_parser.parse_job_from_url(job_url)
