@@ -21,7 +21,8 @@ async def send_jobs():
                                                    new_web_job.requests_count, new_web_job.time, new_web_job.url)
 
                     try:
-                        await bot.send_message(chat_id=user.id, text=text, reply_markup=update)
+                        await bot.send_message(chat_id=user.id, text=text, reply_markup=update,
+                                               disable_web_page_preview=True)
                     except Exception:
                         continue
 
@@ -29,10 +30,11 @@ async def send_jobs():
                 new_habr_job = await user.get_new_habr_job(habr_job)
 
                 if new_habr_job:
-                    text = new_habr_job_text.format(new_habr_job.title, new_habr_job.description, new_habr_job.date,
-                                                    new_habr_job.price, new_habr_job.requests_count, new_habr_job.url)
+                    text = new_habr_job_text.format(new_habr_job.title, new_habr_job.price, new_habr_job.description,
+                                                    new_habr_job.requests_count, new_habr_job.date, new_habr_job.url)
 
                     try:
-                        await bot.send_message(chat_id=user.id, text=text, reply_markup=update)
+                        await bot.send_message(chat_id=user.id, text=text, reply_markup=update,
+                                               disable_web_page_preview=True)
                     except Exception:
                         continue
