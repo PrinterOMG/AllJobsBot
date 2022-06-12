@@ -126,9 +126,9 @@ class WeblancerParser(Parser):
         else:
             requests_count = job.find("div", class_="float-left float-sm-none text_field").text.strip()
 
-        date = job.find("span", class_="time_ago")
+        date = job.find("span", class_="text-muted")
         delta_time = date.text
-        date = date["title"]
+        date = (date.find("span"))["title"]
 
         job = Job(
             title=title,
