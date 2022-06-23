@@ -11,6 +11,9 @@ filters = InlineKeyboardMarkup(
             InlineKeyboardButton(text="Очистить", callback_data=filter_callback.new(action="clear", object="key_words"))
         ],
         [
+            InlineKeyboardButton(text="Вкл/выкл фильтры", callback_data=filter_callback.new(action="switch", object="none"))
+        ],
+        [
             InlineKeyboardButton(text="Вернуться", callback_data=filter_callback.new(action="back", object="none"))
         ]
     ]

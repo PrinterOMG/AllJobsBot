@@ -19,7 +19,7 @@ async def update_job_message(call: CallbackQuery):
         text = new_web_job_text.format(job.title, job.price, job.description, job.requests_count, job.time, job.url)
 
     try:
-        await call.message.edit_text(text=text, reply_markup=update)
+        await call.message.edit_text(text=text, reply_markup=update, disable_web_page_preview=True)
         await call.answer("Обновлено")
     except Exception:
         await call.answer("Изменений нет")

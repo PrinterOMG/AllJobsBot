@@ -28,7 +28,7 @@ async def show_filters(call: CallbackQuery):
     with session() as s:
         user = s.query(User).get(call.from_user.id)
 
-        text = filters_text.format(await user.filters.get_keywords())
+        text = filters_text.format(await user.get_has_filters(), await user.filters.get_keywords())
 
     await call.message.edit_text(text, reply_markup=filters, parse_mode=ParseMode.MARKDOWN_V2)
     await call.answer()

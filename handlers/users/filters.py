@@ -1,4 +1,4 @@
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, ParseMode
 from aiogram.dispatcher import FSMContext
 
 from keyboards.inline import filters, filter_callback, settings
@@ -20,11 +20,11 @@ async def clear_filter(call: CallbackQuery, callback_data: dict):
             user.filters.key_words = ""
             await user.filters.check()
 
-        text = filters_text.format(await user.filters.get_keywords())
+        text = filters_text.format(await user.get_has_filters(), await user.filters.get_keywords())
 
     try:
         await bot.edit_message_text(chat_id=call.from_user.id, message_id=call.message.message_id, text=text,
-                                    reply_markup=filters)
+                                    reply_markup=filters, parse_mode=ParseMode.MARKDOWN_V2)
 
         await call.answer("Успешно очищено!")
     except Exception:
@@ -52,3 +52,15 @@ async def back(call: CallbackQuery):
 
     await call.message.edit_text(text, reply_markup=settings)
     await call.answer()
+
+
+@dp.callback_query_handler(filter_callback.filter(action="switch"))
+async def switch_filter_status(call: CallbackQuery):
+    with session() as s:
+        user = s.query(User).get(call.from_user.id)
+        user.has_filters = not user.has_filters
+
+        text = filters_text.format(await user.get_has_filters(), await user.filters.get_keywords())
+
+    await bot.edit_message_text(chat_id=call.from_user.id, message_id=call.message.message_id, text=text,
+                                reply_markup=filters, parse_mode=ParseMode.MARKDOWN_V2)
