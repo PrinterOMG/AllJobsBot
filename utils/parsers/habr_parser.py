@@ -42,8 +42,8 @@ class HabrParser(Parser):
     async def _get_job_data(job, url) -> Job:
         title = job.find("h2", class_="task__title").text.strip().split()
         title = " ".join(title)
-        description = job.find("div", class_="task__description").text
-        description = re.sub('<[^<]+?>', '', description).strip()
+        description = job.find("div", class_="task__description").text.strip()
+        # description = re.sub('<[^<]+?>', '', description).strip()
 
         finance = job.find("div", class_="task__finance")
         if finance.find("span", class_="negotiated_price"):
