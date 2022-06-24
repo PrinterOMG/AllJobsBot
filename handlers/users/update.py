@@ -1,7 +1,7 @@
 from aiogram.types import CallbackQuery
 
 from keyboards.inline import update
-from data.messages import new_habr_job_text, new_web_job_text
+from data.messages import new_habr_job_text, new_web_job_text, no_post_habr_text
 from loader import dp, weblancer_parser, habr_parser
 
 
@@ -12,8 +12,10 @@ async def update_job_message(call: CallbackQuery):
 
     if "habr" in job_url:
         job = await habr_parser.parse_job_from_url(job_url)
-        text = new_habr_job_text.format(job.title, job.price, job.description, job.requests_count, job.date, job.url)
-
+        if job:
+            text = new_habr_job_text.format(job.title, job.price, job.description, job.requests_count, job.date, job.url)
+        else:
+            text = no_post_habr_text.format(job_url)
     else:
         job = await weblancer_parser.parse_job_from_url(job_url)
         text = new_web_job_text.format(job.title, job.price, job.description, job.requests_count, job.time, job.url)

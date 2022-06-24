@@ -32,9 +32,12 @@ class HabrParser(Parser):
         async with aiohttp.ClientSession() as session:
             async with session.get(job_url) as response:
                 soup = BeautifulSoup(await response.text(), "lxml")
-
-        job = soup.find("div", class_="task task_detail")
-        job = await self._get_job_data(job, job_url)
+                page_ok = response.ok
+        if page_ok:
+            job = soup.find("div", class_="task task_detail")
+            job = await self._get_job_data(job, job_url)
+        else:
+            job = page_ok
 
         return job
 
