@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.dispatcher.filters.builtin import CommandStart
 
-from utils.db_api import Filter, Subscribe, User, LastJob, session
+from utils.db_api import Filter, Subscribe, User, LastJob, Tutorial, session
 from loader import dp
 
 
@@ -23,4 +23,7 @@ async def bot_start(message: types.Message):
             last_jobs = LastJob()
             last_jobs.user_id = message.from_user.id
 
-            s.add_all([user, filters, subscribes, last_jobs])
+            tutorial = Tutorial()
+            tutorial.user_id = message.from_user.id
+
+            s.add_all([user, filters, subscribes, last_jobs, tutorial])

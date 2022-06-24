@@ -15,8 +15,10 @@ class Filter(Base):
     user = relationship("User", back_populates="filters")
 
     async def is_job_filtered(self, job):
+        text_for_search = job.title + " " + job.description
+
         for word in self.key_words.split(";"):
-            if word.lower() in job.title.lower().translate(TRANSLATE_TABLE).split():
+            if word.lower() in text_for_search.lower().translate(TRANSLATE_TABLE).split():
                 return True
 
         return False

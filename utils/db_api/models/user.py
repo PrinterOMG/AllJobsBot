@@ -14,6 +14,7 @@ class User(Base):
     filters = relationship("Filter", uselist=False, back_populates="user")
     subscribes = relationship("Subscribe", uselist=False, back_populates="user")
     last_jobs = relationship("LastJob", uselist=False, back_populates="user")
+    tutorial = relationship("Tutorial", uselist=False, back_populates="user")
 
     async def get_new_web_job(self, jobs):
         for job in jobs:
