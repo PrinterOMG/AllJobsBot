@@ -2,6 +2,7 @@ import re
 
 import aiohttp
 
+from . import Job
 from .parsers_helper import Job
 from .core_parser import Parser
 
@@ -28,16 +29,16 @@ class HabrParser(Parser):
 
         return job
 
-    async def parse_job_from_url(self, job_url) -> Job:
+    async def parse_job_from_url(self, job_url) -> Job | None:
         async with aiohttp.ClientSession() as session:
             async with session.get(job_url) as response:
                 soup = BeautifulSoup(await response.text(), "lxml")
                 page_ok = response.ok
-        if page_ok:
-            job = soup.find("div", class_="task task_detail")
-            job = await self._get_job_data(job, job_url)
-        else:
-            job = page_ok
+        if not page_ok:
+            return None
+
+        job = soup.find("div", class_="task task_detail")
+        job = await self._get_job_data(job, job_url)
 
         return job
 

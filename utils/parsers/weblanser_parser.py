@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import aiohttp
 
+from . import Job
 from .parsers_helper import Job
 from .core_parser import Parser
 
@@ -41,44 +42,43 @@ class WeblancerParser(Parser):
 
         return parsed_jobs
 
-    async def parse_job_from_url(self, job_url) -> Job:
+    async def parse_job_from_url(self, job_url) -> Job | None:
         async with aiohttp.ClientSession() as session:
             async with session.get(job_url) as response:
                 soup = BeautifulSoup(await response.text(), "lxml")
                 page_ok = response.ok
 
-        if page_ok:
-            title = soup.find("h1").text
-            title = title[:title.rfind("–") - 1]
+        if not page_ok:
+            return None
+        title = soup.find("h1").text
+        title = title[:title.rfind("–") - 1]
 
-            description = soup.find("div", class_="cols_table no_hover").find("p").text.strip()
+        description = soup.find("div", class_="cols_table no_hover").find("p").text.strip()
 
-            time = soup.find("div", class_="float-right text-muted hidden-xs-down").find("span").text
+        time = soup.find("div", class_="float-right text-muted hidden-xs-down").find("span").text
 
-            requests_count = soup.find("div", class_="block-content text_field").find("span").text.lower()
-            if "нет" in requests_count:
-                requests_count = 0
-            else:
-                requests_count = requests_count[:requests_count.find(" ")]
-
-            if price := soup.find("span", class_="title amount"):
-                price = price.text
-            else:
-                price = "Не указана"
-
-            job = Job(
-                title=title,
-                price=price,
-                url=job_url,
-                description=description,
-                category=None,
-                tags=None,
-                time=time,
-                date=None,
-                requests_count=requests_count
-            )
+        requests_count = soup.find("div", class_="block-content text_field").find("span").text.lower()
+        if "нет" in requests_count:
+            requests_count = 0
         else:
-            job = page_ok
+            requests_count = requests_count[:requests_count.find(" ")]
+
+        if price := soup.find("span", class_="title amount"):
+            price = price.text
+        else:
+            price = "Не указана"
+
+        job = Job(
+            title=title,
+            price=price,
+            url=job_url,
+            description=description,
+            category=None,
+            tags=None,
+            time=time,
+            date=None,
+            requests_count=requests_count
+        )
 
         return job
 
