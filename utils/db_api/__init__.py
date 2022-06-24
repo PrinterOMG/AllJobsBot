@@ -1,2 +1,2 @@
-from .models import Filter, User, Subscribe, LastJob
-from .base import session
+from .models import Filter, User, Subscribe, LastJob, Tutorial
+from .base import session, metadata

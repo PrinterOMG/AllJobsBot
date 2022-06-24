@@ -4,6 +4,7 @@ from aiogram.types import Message, CallbackQuery, ParseMode
 from keyboards.inline import settings, filters, subscribes
 
 from data.messages import settings_text, filters_text, subscribes_text
+import data.tutorial as tut
 
 from loader import dp, bot
 from utils.db_api import User, session
@@ -28,10 +29,18 @@ async def show_filters(call: CallbackQuery):
     with session() as s:
         user = s.query(User).get(call.from_user.id)
 
+        show_tutorial = user.tutorial.show_filters
+        if show_tutorial:
+            user.tutorial.show_filters = False
+
         text = filters_text.format(await user.get_has_filters(), await user.filters.get_keywords())
 
     await call.message.edit_text(text, reply_markup=filters, parse_mode=ParseMode.MARKDOWN_V2)
-    await call.answer()
+
+    if show_tutorial:
+        await call.answer(tut.filters, show_alert=True)
+    else:
+        await call.answer()
 
 
 @dp.callback_query_handler(text="subscribes")
@@ -39,10 +48,18 @@ async def show_subscribes(call: CallbackQuery):
     with session() as s:
         user = s.query(User).get(call.from_user.id)
 
+        show_tutorial = user.tutorial.show_subscribes
+        if show_tutorial:
+            user.tutorial.show_subscribes = False
+
         text = subscribes_text.format(await user.subscribes.get_weblancer(), await user.subscribes.get_habr())
 
     await call.message.edit_text(text, reply_markup=subscribes)
-    await call.answer()
+
+    if show_tutorial:
+        await call.answer(tut.subscribes, show_alert=True)
+    else:
+        await call.answer()
 
 
 @dp.callback_query_handler(text="close")

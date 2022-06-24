@@ -32,7 +32,7 @@ async def get_filters(message: Message, state: FSMContext):
 
         await user.filters.check()
 
-        text = filters_text.format(await user.filters.get_keywords())
+        text = filters_text.format(await user.get_has_filters(), await user.filters.get_keywords())
 
     await state.finish()
 
