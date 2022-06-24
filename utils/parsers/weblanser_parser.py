@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 import aiohttp
 
-from . import Job
 from .parsers_helper import Job
 from .core_parser import Parser
 

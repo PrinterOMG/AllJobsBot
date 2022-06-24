@@ -1,8 +1,5 @@
-import re
-
 import aiohttp
 
-from . import Job
 from .parsers_helper import Job
 from .core_parser import Parser
 
