@@ -1,3 +1,5 @@
+from aiogram.utils.exceptions import BotBlocked
+
 from loader import weblancer_parser, habr_parser, bot
 from data.messages import new_web_job_text, new_habr_job_text
 from data.config import WEBLANCER_PAGES_COUNT
@@ -10,7 +12,7 @@ async def send_jobs():
     habr_job = await habr_parser.parse_last_job()
 
     with session() as s:
-        users = s.query(User).all()
+        users = s.query(User).filter(not User.is_blocked).all()
 
         for user in users:
             if user.subscribes.weblancer_subscribe:
@@ -23,8 +25,8 @@ async def send_jobs():
                     try:
                         await bot.send_message(chat_id=user.id, text=text, reply_markup=update,
                                                disable_web_page_preview=True)
-                    except Exception:
-                        continue
+                    except BotBlocked:
+                        user.is_blocked = True
 
             if user.subscribes.habr_subscribe:
                 new_habr_job = await user.get_new_habr_job(habr_job)
@@ -36,5 +38,5 @@ async def send_jobs():
                     try:
                         await bot.send_message(chat_id=user.id, text=text, reply_markup=update,
                                                disable_web_page_preview=True)
-                    except Exception:
-                        continue
+                    except BotBlocked:
+                        user.is_blocked = True

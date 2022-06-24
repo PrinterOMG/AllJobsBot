@@ -10,6 +10,7 @@ class User(Base):
     id = Column(BigInteger, primary_key=True)
     has_filters = Column(Boolean, default=False)
     has_subscribes = Column(Boolean, default=False)
+    is_blocked = Column(Boolean, default=False)
 
     filters = relationship("Filter", uselist=False, back_populates="user")
     subscribes = relationship("Subscribe", uselist=False, back_populates="user")
