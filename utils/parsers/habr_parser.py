@@ -42,7 +42,10 @@ class HabrParser(Parser):
     async def _get_job_data(job, url) -> Job:
         title = job.find("h2", class_="task__title").text.strip().split()
         title = " ".join(title)
-        description = job.find("div", class_="task__description").text.strip()
+        description_with_tags = str(job.find("div", class_="task__description"))
+        description_with_no_br = [i for i in description_with_tags.split("<br/>") if i != ""]
+        description = " ".join(description_with_no_br)
+        description = BeautifulSoup(description, "lxml").text.strip()
         # description = re.sub('<[^<]+?>', '', description).strip()
 
         finance = job.find("div", class_="task__finance")
