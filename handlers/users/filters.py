@@ -64,3 +64,4 @@ async def switch_filter_status(call: CallbackQuery):
 
     await bot.edit_message_text(chat_id=call.from_user.id, message_id=call.message.message_id, text=text,
                                 reply_markup=filters, parse_mode=ParseMode.MARKDOWN_V2)
+    await call.answer()
