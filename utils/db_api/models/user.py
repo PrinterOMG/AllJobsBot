@@ -17,23 +17,22 @@ class User(Base):
     last_jobs = relationship("LastJob", uselist=False, back_populates="user")
     tutorial = relationship("Tutorial", uselist=False, back_populates="user")
 
-    async def get_new_web_job(self, jobs):
-        for job in jobs:
-            if job.url == self.last_jobs.weblancer_last_job:
-                return None
+    async def get_new_web_job(self, job):
+        if job.url == self.last_jobs.weblancer_last_job:
+            return None
 
-            if self.has_filters:
-                if await self.filters.is_job_filtered(job):
-                    self.last_jobs.weblancer_last_job = job.url
-                    return job
-
-                else:
-                    self.last_jobs.weblancer_last_job = job.url
-                    return None
+        if self.has_filters:
+            if await self.filters.is_job_filtered(job):
+                self.last_jobs.weblancer_last_job = job.url
+                return job
 
             else:
                 self.last_jobs.weblancer_last_job = job.url
-                return job
+                return None
+
+        else:
+            self.last_jobs.weblancer_last_job = job.url
+            return job
 
     async def get_new_habr_job(self, job):
         if job.url == self.last_jobs.habr_last_job:

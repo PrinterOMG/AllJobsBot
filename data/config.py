@@ -13,5 +13,3 @@ DATABASE_URL = env.str("DATABASE_URL")
 TRANSLATE_TABLE = str.maketrans(dict.fromkeys(string.punctuation))
 
 PARSING_INTERVAL = 20  # In seconds
-
-WEBLANCER_PAGES_COUNT = 4

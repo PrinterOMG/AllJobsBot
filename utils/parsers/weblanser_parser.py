@@ -14,15 +14,14 @@ class WeblancerParser(Parser):
         self.request_url = "https://www.weblancer.net/jobs/?page={0}"
         self.url = "https://www.weblancer.net"
 
-    async def parse_jobs(self, pages_count: int) -> list:
+    async def parse_last_job(self) -> Job:
         """
         Возвращает отфильтрованный список заказов
 
-        :param pages_count: Количество страниц для парсинга
-        :return: Отфильтрованный список заказов
+        :return: Последний заказ
         """
-        parsed_jobs = list()
-        for page in range(1, pages_count + 1):
+        page = 1
+        while True:
             url = self.request_url.format(page)
 
             async with aiohttp.ClientSession() as session:
@@ -34,12 +33,10 @@ class WeblancerParser(Parser):
             for job in jobs:
                 job = await self._get_job_data(job)
 
-                if not job:
-                    continue
+                if job:
+                    return job
 
-                parsed_jobs.append(job)
-
-        return parsed_jobs
+            page += 1
 
     async def parse_job_from_url(self, job_url) -> Job | None:
         async with aiohttp.ClientSession() as session:

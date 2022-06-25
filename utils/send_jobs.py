@@ -2,13 +2,12 @@ from aiogram.utils.exceptions import BotBlocked
 
 from loader import weblancer_parser, habr_parser, bot
 from data.messages import new_web_job_text, new_habr_job_text
-from data.config import WEBLANCER_PAGES_COUNT
 from utils.db_api import User, session
 from keyboards.inline import update
 
 
 async def send_jobs():
-    web_jobs = await weblancer_parser.parse_jobs(WEBLANCER_PAGES_COUNT)
+    web_job = await weblancer_parser.parse_last_job()
     habr_job = await habr_parser.parse_last_job()
 
     with session() as s:
@@ -16,7 +15,7 @@ async def send_jobs():
 
         for user in users:
             if user.subscribes.weblancer_subscribe:
-                new_web_job = await user.get_new_web_job(web_jobs)
+                new_web_job = await user.get_new_web_job(web_job)
 
                 if new_web_job:
                     text = new_web_job_text.format(new_web_job.title, new_web_job.price, new_web_job.description,
