@@ -11,11 +11,15 @@ async def send_jobs():
     habr_job = await habr_parser.parse_last_job()
 
     with session() as s:
-        users = s.query(User).filter(not User.is_blocked).all()
+        users = s.query(User).filter(User.is_blocked == 0).all()
+        print(1)
+        print(users)
 
         for user in users:
+            print("user", user)
             if user.subscribes.weblancer_subscribe:
                 new_web_job = await user.get_new_web_job(web_job)
+                print("new_web_job", new_web_job.title)
 
                 if new_web_job:
                     text = new_web_job_text.format(new_web_job.title, new_web_job.price, new_web_job.description,
