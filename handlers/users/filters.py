@@ -58,6 +58,11 @@ async def back(call: CallbackQuery):
 async def switch_filter_status(call: CallbackQuery):
     with session() as s:
         user = s.query(User).get(call.from_user.id)
+
+        if not user.filters.key_words:
+            await call.answer(show_alert=True, text="У вас нет ключевых слов!")
+            return
+
         user.has_filters = not user.has_filters
 
         text = filters_text.format(await user.get_has_filters(), await user.filters.get_keywords())

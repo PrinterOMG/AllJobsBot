@@ -11,7 +11,7 @@ async def send_jobs():
     habr_job = await habr_parser.parse_last_job()
 
     with session() as s:
-        users = s.query(User).filter(User.is_blocked == 0).all()
+        users = s.query(User).filter(User.is_blocked == False).all()
 
         for user in users:
             if user.subscribes.weblancer_subscribe:

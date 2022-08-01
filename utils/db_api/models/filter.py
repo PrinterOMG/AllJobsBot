@@ -16,8 +16,6 @@ class Filter(Base):
 
     async def is_job_filtered(self, job):
         text_for_search = job.title + " " + job.description
-        print("filter text", text_for_search)
-        print("filter text 2", text_for_search.lower().translate(TRANSLATE_TABLE).split())
 
         for word in self.key_words.split(";"):
             if word.lower() in text_for_search.lower().translate(TRANSLATE_TABLE).split():
