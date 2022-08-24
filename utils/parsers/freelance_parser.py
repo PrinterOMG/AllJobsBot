@@ -58,7 +58,8 @@ class FreelanceParser(Parser):
 
         requests_count_raw = job_info_raw.find("span", title="Отклики")
         if requests_count_raw:
-            requests_count = int(requests_count_raw[requests_count_raw.rfind(":") + 1:])
+            requests_count = requests_count_raw.text
+            requests_count = int(requests_count[requests_count.rfind(":") + 1:])
         else:
             requests_count = 0
         job_data["requests_count"] = requests_count
