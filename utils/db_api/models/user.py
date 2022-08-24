@@ -1,4 +1,5 @@
 from ..base import Base
+from ...parsers import Job
 
 from sqlalchemy import Column, BigInteger, Boolean
 from sqlalchemy.orm import relationship
@@ -17,7 +18,7 @@ class User(Base):
     last_jobs = relationship("LastJob", uselist=False, back_populates="user")
     tutorial = relationship("Tutorial", uselist=False, back_populates="user")
 
-    async def get_new_web_job(self, job):
+    async def get_new_web_job(self, job) -> Job | None:
         if job.url == self.last_jobs.weblancer_last_job:
             return None
 
@@ -34,7 +35,7 @@ class User(Base):
             self.last_jobs.weblancer_last_job = job.url
             return job
 
-    async def get_new_habr_job(self, job):
+    async def get_new_habr_job(self, job) -> Job | None:
         if job.url == self.last_jobs.habr_last_job:
             return None
 
@@ -49,6 +50,23 @@ class User(Base):
 
         else:
             self.last_jobs.habr_last_job = job.url
+            return job
+
+    async def get_new_freelance_job(self, job) -> Job:
+        if job.url == self.last_jobs.freelance_last_job:
+            return None
+
+        if self.has_filters:
+            if await self.filters.is_job_filtered(job):
+                self.last_jobs.freelance_last_job = job.url
+                return job
+
+            else:
+                self.last_jobs.freelance_last_job = job.url
+                return None
+
+        else:
+            self.last_jobs.freelance_last_job = job.url
             return job
 
     async def get_has_filters(self):

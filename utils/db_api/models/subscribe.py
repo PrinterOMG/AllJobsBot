@@ -11,6 +11,7 @@ class Subscribe(Base):
     user_id = Column(BigInteger, ForeignKey("users.id"))
     weblancer_subscribe = Column(Boolean, default=False)
     habr_subscribe = Column(Boolean, default=False)
+    freelance_subscribe = Column(Boolean, default=False)
 
     user = relationship("User", back_populates="subscribes")
 
@@ -32,14 +33,22 @@ class Subscribe(Base):
 
         return "Нет ⛔️"
 
+    async def get_freelance(self):
+        if self.freelance_subscribe:
+            return "Есть ✅"
+
+        return "Нет ⛔️"
+
     async def sub_all(self):
         self.weblancer_subscribe = True
         self.habr_subscribe = True
+        self.freelance_subscribe = True
 
         self.user.has_subscribes = True
 
     async def unsub_all(self):
         self.weblancer_subscribe = False
         self.habr_subscribe = False
+        self.freelance_subscribe = False
 
         self.user.has_subscribes = False

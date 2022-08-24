@@ -13,6 +13,9 @@ subscribes = InlineKeyboardMarkup(
             InlineKeyboardButton(text="Изменить статус подписки Habr", callback_data=subscribes_callback.new(object="habr"))
         ],
         [
+            InlineKeyboardButton(text="Изменить статус подписки Freelance", callback_data=subscribes_callback.new(object="freelance"))
+        ],
+        [
             InlineKeyboardButton(text="Подписка на всё", callback_data=subscribes_callback.new(object="sub_all")),
             InlineKeyboardButton(text="Отписка от всего", callback_data=subscribes_callback.new(object="unsub_all"))
         ],

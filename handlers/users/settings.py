@@ -52,7 +52,11 @@ async def show_subscribes(call: CallbackQuery):
         if show_tutorial:
             user.tutorial.show_subscribes = False
 
-        text = subscribes_text.format(await user.subscribes.get_weblancer(), await user.subscribes.get_habr())
+        text = subscribes_text.format(
+            weblancer=await user.subscribes.get_weblancer(),
+            habr=await user.subscribes.get_habr(),
+            freelance=await user.subscribes.get_freelance()
+        )
 
     await call.message.edit_text(text, reply_markup=subscribes)
 

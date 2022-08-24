@@ -24,10 +24,32 @@ async def change_weblancer_subscribe(call: CallbackQuery):
         user.subscribes.weblancer_subscribe = not user.subscribes.weblancer_subscribe
         await user.subscribes.check()
 
-        text = subscribes_text.format(await user.subscribes.get_weblancer(), await user.subscribes.get_habr())
+        text = subscribes_text.format(
+            weblancer=await user.subscribes.get_weblancer(),
+            habr=await user.subscribes.get_habr(),
+            freelance=await user.subscribes.get_freelance()
+        )
 
     await call.message.edit_text(text, reply_markup=subscribes)
     await call.answer("Успешно")
+
+
+@dp.callback_query_handler(subscribes_callback.filter(object="freelance"))
+async def change_freelance_subscribe(call: CallbackQuery):
+    with session() as s:
+        user = s.query(User).get(call.from_user.id)
+        user.subscribes.freelance_subscribe = not user.subscribes.freelance_subscribe
+        await user.subscribes.check()
+
+        text = subscribes_text.format(
+            weblancer=await user.subscribes.get_weblancer(),
+            habr=await user.subscribes.get_habr(),
+            freelance=await user.subscribes.get_freelance()
+        )
+
+    await call.message.edit_text(text, reply_markup=subscribes)
+    await call.answer("Успешно")
+
 
 
 @dp.callback_query_handler(subscribes_callback.filter(object="habr"))
@@ -38,7 +60,11 @@ async def change_habr_subscribe(call: CallbackQuery):
         user.subscribes.habr_subscribe = not user.subscribes.habr_subscribe
         await user.subscribes.check()
 
-        text = subscribes_text.format(await user.subscribes.get_weblancer(), await user.subscribes.get_habr())
+        text = subscribes_text.format(
+            weblancer=await user.subscribes.get_weblancer(),
+            habr=await user.subscribes.get_habr(),
+            freelance=await user.subscribes.get_freelance()
+        )
 
     await call.message.edit_text(text, reply_markup=subscribes)
     await call.answer("Успешно")
@@ -51,7 +77,11 @@ async def sub_all(call: CallbackQuery):
 
         await user.subscribes.sub_all()
 
-        text = subscribes_text.format(await user.subscribes.get_weblancer(), await user.subscribes.get_habr())
+        text = subscribes_text.format(
+            weblancer=await user.subscribes.get_weblancer(),
+            habr=await user.subscribes.get_habr(),
+            freelance=await user.subscribes.get_freelance()
+        )
 
     await call.message.edit_text(text, reply_markup=subscribes)
     await call.answer("Успешно")
@@ -64,7 +94,11 @@ async def sub_all(call: CallbackQuery):
 
         await user.subscribes.unsub_all()
 
-        text = subscribes_text.format(await user.subscribes.get_weblancer(), await user.subscribes.get_habr())
+        text = subscribes_text.format(
+            weblancer=await user.subscribes.get_weblancer(),
+            habr=await user.subscribes.get_habr(),
+            freelance=await user.subscribes.get_freelance()
+        )
 
     await call.message.edit_text(text, reply_markup=subscribes)
     await call.answer("Успешно")

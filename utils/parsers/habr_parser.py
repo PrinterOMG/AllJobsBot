@@ -7,9 +7,8 @@ from bs4 import BeautifulSoup
 
 
 class HabrParser(Parser):
-    def __init__(self):
-        self.main_url = "https://freelance.habr.com/tasks"
-        self.url_to_job = "https://freelance.habr.com"
+    main_url = "https://freelance.habr.com/tasks"
+    url_to_job = "https://freelance.habr.com"
 
     async def parse_last_job(self) -> Job:
         async with aiohttp.ClientSession() as session:
@@ -44,8 +43,8 @@ class HabrParser(Parser):
         title = job.find("h2", class_="task__title").text.strip().split()
         title = " ".join(title)
         description_with_tags = str(job.find("div", class_="task__description"))
-        description_with_no_br = [i for i in description_with_tags.split("<br/>") if i != ""]
-        description = " ".join(description_with_no_br)
+        description_without_br = [i for i in description_with_tags.split("<br/>") if i != ""]
+        description = " ".join(description_without_br)
         description = BeautifulSoup(description, "lxml").text.strip()
         # description = re.sub('<[^<]+?>', '', description).strip()
 

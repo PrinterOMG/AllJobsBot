@@ -6,13 +6,8 @@ from .core_parser import Parser
 
 
 class WeblancerParser(Parser):
-    def __init__(self):
-        """
-        Инициализация класса
-        """
-
-        self.request_url = "https://www.weblancer.net/jobs/?page={0}"
-        self.url = "https://www.weblancer.net"
+    request_url = "https://www.weblancer.net/jobs/?page={0}"
+    url = "https://www.weblancer.net"
 
     async def parse_last_job(self) -> Job:
         """
