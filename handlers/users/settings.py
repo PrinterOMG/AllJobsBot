@@ -16,7 +16,8 @@ async def show_settings(message: Message):
         user = s.query(User).get(message.from_user.id)
 
         if user:
-            text = settings_text.format(await user.get_has_subscribes(), await user.get_has_filters())
+            text = settings_text.format(subscribes_status=await user.get_has_subscribes(),
+                                        filters_status=await user.get_has_filters())
         else:
             await message.answer("Пожалуйста, напишите /start")
 
@@ -33,7 +34,8 @@ async def show_filters(call: CallbackQuery):
         if show_tutorial:
             user.tutorial.show_filters = False
 
-        text = filters_text.format(await user.get_has_filters(), await user.filters.get_keywords())
+        text = filters_text.format(status=await user.get_has_filters(),
+                                   key_words=await user.filters.get_keywords())
 
     await call.message.edit_text(text, reply_markup=filters, parse_mode=ParseMode.MARKDOWN_V2)
 
@@ -64,8 +66,3 @@ async def show_subscribes(call: CallbackQuery):
         await call.answer(tut.subscribes, show_alert=True)
     else:
         await call.answer()
-
-
-@dp.callback_query_handler(text="close")
-async def close_settings_message(call: CallbackQuery):
-    await bot.delete_message(chat_id=call.from_user.id, message_id=call.message.message_id)

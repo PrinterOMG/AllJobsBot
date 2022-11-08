@@ -20,7 +20,8 @@ async def clear_filter(call: CallbackQuery, callback_data: dict):
             user.filters.key_words = ""
             await user.filters.check()
 
-        text = filters_text.format(await user.get_has_filters(), await user.filters.get_keywords())
+        text = filters_text.format(status=await user.get_has_filters(),
+                                   key_words=await user.filters.get_keywords())
 
     try:
         await bot.edit_message_text(chat_id=call.from_user.id, message_id=call.message.message_id, text=text,
@@ -48,7 +49,8 @@ async def back(call: CallbackQuery):
     with session() as s:
         user = s.query(User).get(call.from_user.id)
 
-        text = settings_text.format(await user.get_has_subscribes(), await user.get_has_filters())
+        text = settings_text.format(subscribes_status=await user.get_has_subscribes(),
+                                    filters_status=await user.get_has_filters())
 
     await call.message.edit_text(text, reply_markup=settings)
     await call.answer()
@@ -65,7 +67,8 @@ async def switch_filter_status(call: CallbackQuery):
 
         user.has_filters = not user.has_filters
 
-        text = filters_text.format(await user.get_has_filters(), await user.filters.get_keywords())
+        text = filters_text.format(status=await user.get_has_filters(),
+                                   key_words=await user.filters.get_keywords())
 
     await bot.edit_message_text(chat_id=call.from_user.id, message_id=call.message.message_id, text=text,
                                 reply_markup=filters, parse_mode=ParseMode.MARKDOWN_V2)

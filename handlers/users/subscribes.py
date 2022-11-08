@@ -11,7 +11,8 @@ from utils.db_api import User, session
 async def go_to_settings(call: CallbackQuery):
     with session() as s:
         user = s.query(User).get(call.from_user.id)
-        text = settings_text.format(await user.get_has_subscribes(), await user.get_has_filters())
+        text = settings_text.format(subscribes_status=await user.get_has_subscribes(),
+                                    filters_status=await user.get_has_filters())
 
     await call.message.edit_text(text, reply_markup=settings)
     await call.answer()

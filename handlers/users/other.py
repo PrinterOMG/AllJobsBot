@@ -1,8 +1,8 @@
 from aiogram.dispatcher.filters import Text
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from aiogram.dispatcher import FSMContext
 
-from loader import dp
+from loader import dp, bot
 
 
 @dp.message_handler(state='*', commands='cancel')
@@ -14,3 +14,8 @@ async def cancel_handler(message: Message, state: FSMContext):
 
     await state.finish()
     await message.answer('Отменено')
+
+
+@dp.callback_query_handler(text="close")
+async def close_message(call: CallbackQuery):
+    await bot.delete_message(chat_id=call.from_user.id, message_id=call.message.message_id)

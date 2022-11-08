@@ -19,8 +19,14 @@ async def send_jobs():
                 new_web_job = await user.get_new_web_job(web_job)
 
                 if new_web_job:
-                    text = new_web_job_text.format(new_web_job.title, new_web_job.price, new_web_job.description,
-                                                   new_web_job.requests_count, new_web_job.time, new_web_job.url)
+                    text = new_web_job_text.format(
+                        title=new_web_job.title,
+                        price=new_web_job.price,
+                        description=new_web_job.description,
+                        requests_count=new_web_job.requests_count,
+                        date=new_web_job.date,
+                        url=new_web_job.url
+                    )
 
                     try:
                         await bot.send_message(chat_id=user.id, text=text, reply_markup=update,
@@ -32,8 +38,14 @@ async def send_jobs():
                 new_habr_job = await user.get_new_habr_job(habr_job)
 
                 if new_habr_job:
-                    text = new_habr_job_text.format(new_habr_job.title, new_habr_job.price, new_habr_job.description,
-                                                    new_habr_job.requests_count, new_habr_job.date, new_habr_job.url)
+                    text = new_habr_job_text.format(
+                        title=new_habr_job.title,
+                        price=new_habr_job.price,
+                        description=new_habr_job.description,
+                        requests_count=new_habr_job.requests_count,
+                        date=new_habr_job.date,
+                        url=new_habr_job.url
+                    )
 
                     try:
                         await bot.send_message(chat_id=user.id, text=text, reply_markup=update,
