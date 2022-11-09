@@ -1,6 +1,21 @@
 version: '2'
 
 services:
+  postgres:
+    image: postgres:latest
+    container_name: "${BOT_NAME}PostgresContainer"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    env_file:
+      - ".env"
+    ports:
+      - "5432:5432"
+    volumes:
+      - all_jobs_bot_postgres_volume:/var/lib/postgresql/data
+    networks:
+      - tg_bot
   bot:
     image: "${BOT_IMAGE_NAME:-tg_bot-image}"
     container_name: "${BOT_CONTAINER_NAME:-tg_bot-container}"
@@ -18,10 +33,12 @@ services:
       - ".env"
     networks:
     - tg_bot
-  postgres:
-    image: postgres:latest
 
 
 networks:
   tg_bot:
     driver: bridge
+
+
+volumes:
+  all_jobs_bot_postgres_volume:
