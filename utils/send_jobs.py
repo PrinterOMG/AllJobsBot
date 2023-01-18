@@ -4,18 +4,20 @@ from loader import weblancer_parser, habr_parser, freelance_parser, bot
 from data.messages import new_web_job_text, new_habr_job_text, new_freelance_job_text
 from utils.db_api import User, session
 from keyboards.inline import update
+from utils.parsers import Job
 
 
 async def send_jobs():
     web_job = await weblancer_parser.parse_last_job()
     habr_job = await habr_parser.parse_last_job()
-    freelance_job = await freelance_parser.parse_last_job()
+    # freelance_job = await freelance_parser.parse_last_job()
+    freelance_job = None
 
     with session() as s:
         users = s.query(User).filter(User.is_blocked == False).all()
 
         for user in users:
-            if user.subscribes.weblancer_subscribe:
+            if user.subscribes.weblancer_subscribe and web_job:
                 new_web_job = await user.get_new_web_job(web_job)
 
                 if new_web_job:
@@ -34,7 +36,7 @@ async def send_jobs():
                     except BotBlocked:
                         user.is_blocked = True
 
-            if user.subscribes.habr_subscribe:
+            if user.subscribes.habr_subscribe and habr_job:
                 new_habr_job = await user.get_new_habr_job(habr_job)
 
                 if new_habr_job:
@@ -53,7 +55,7 @@ async def send_jobs():
                     except BotBlocked:
                         user.is_blocked = True
 
-            if user.subscribes.freelance_subscribe:
+            if user.subscribes.freelance_subscribe and freelance_job:
                 new_freelance_job = await user.get_new_freelance_job(freelance_job)
 
                 if new_freelance_job:
