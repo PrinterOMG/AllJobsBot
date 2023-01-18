@@ -8,7 +8,7 @@ from loader import dp, weblancer_parser, habr_parser
 @dp.callback_query_handler(text="update")
 async def update_job_message(call: CallbackQuery):
     text = call.message.text
-    job_url = text[text.find("URL: ") + 5:]
+    job_url = text[text.find("URL: ") + 5:text.rfind('-')].strip()
 
     if "habr" in job_url:
         job = await habr_parser.parse_job_from_url(job_url)
