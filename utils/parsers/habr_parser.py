@@ -1,7 +1,9 @@
+import asyncio
+
 import aiohttp
 
-from .parsers_helper import Job
-from .core_parser import Parser
+from utils.parsers.parsers_helper import Job
+from utils.parsers.core_parser import Parser
 
 from bs4 import BeautifulSoup
 
@@ -33,8 +35,11 @@ class HabrParser(Parser):
         if not page_ok:
             return None
 
-        job = soup.find("div", class_="task task_detail")
-        job = await self._get_job_data(job, job_url)
+        try:
+            job = soup.find("div", class_="task task_detail")
+            job = await self._get_job_data(job, job_url)
+        except AttributeError:
+            return None
 
         return job
 
