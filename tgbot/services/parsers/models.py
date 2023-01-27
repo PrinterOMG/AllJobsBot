@@ -34,6 +34,8 @@ class FreelanceRuJob(Job):
 
 
 class WeblancerJob(Job):
+    views_count: int
+
     marketplace = 'Weblancer'
     marketplace_url = 'https://www.weblancer.net/'
 

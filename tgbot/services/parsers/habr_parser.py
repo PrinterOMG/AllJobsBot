@@ -19,19 +19,12 @@ class HabrParser(Parser):
             async with session.get(cls.jobs_list_url) as response:
                 if not response.ok:
                     return None
-
                 soup = BeautifulSoup(await response.text(), 'lxml')
-                first_job_url = soup.find('li', class_='content-list__item').find('a')['href']
-                first_job_url = cls.marketplace_url + first_job_url
 
-            async with session.get(first_job_url) as response:
-                if not response.ok:
-                    return None
+        first_job_url = soup.find('li', class_='content-list__item').find('a')['href']
+        first_job_url = cls.marketplace_url + first_job_url
 
-                soup = BeautifulSoup(await response.text(), 'lxml')
-                first_job = soup.find('section', class_='column_wrap')
-
-                return cls._get_job_data(first_job, first_job_url)
+        return await cls.parse_job_with_url(first_job_url)
 
     @classmethod
     async def parse_job_with_url(cls, url: str) -> HabrJob | None:
@@ -39,11 +32,11 @@ class HabrParser(Parser):
             async with session.get(url) as response:
                 if not response.ok:
                     return None
-
                 soup = BeautifulSoup(await response.text(), 'lxml')
-                job = soup.find('section', class_='column_wrap')
 
-                return cls._get_job_data(job, url)
+        job = soup.find('section', class_='column_wrap')
+
+        return cls._get_job_data(job, url)
 
     @classmethod
     def _get_job_data(cls, job_html: Tag, url: str) -> HabrJob:
