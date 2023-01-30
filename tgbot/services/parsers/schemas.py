@@ -26,7 +26,7 @@ class HabrJob(Job):
 
 class FreelanceRuJob(Job):
     views_count: int
-    term: timedelta
+    term: str
     is_premium: bool
 
     marketplace = 'FreelanceRu'
@@ -39,3 +39,6 @@ class WeblancerJob(Job):
     marketplace = 'Weblancer'
     marketplace_url = 'https://www.weblancer.net/'
 
+
+class InDevelopmentError(Exception):
+    pass

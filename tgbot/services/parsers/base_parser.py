@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from tgbot.services.parsers.models import Job
+from tgbot.services.parsers.schemas import Job
 
 
 class Parser(ABC):

@@ -5,7 +5,7 @@ import aiohttp
 from bs4 import BeautifulSoup, Tag
 
 from tgbot.services.parsers.base_parser import Parser
-from tgbot.services.parsers.models import WeblancerJob
+from tgbot.services.parsers.schemas import WeblancerJob
 
 
 class WeblancerParser(Parser):
@@ -30,6 +30,8 @@ class WeblancerParser(Parser):
 
                     job_url = cls.marketplace_url + job.find('div', class_='title').find('a')['href']
                     return await cls.parse_job_with_url(job_url)
+
+                page += 1
 
     @classmethod
     async def parse_job_with_url(cls, url: str) -> WeblancerJob | None:

@@ -5,7 +5,7 @@ import aiohttp
 from bs4 import BeautifulSoup, Tag
 
 from tgbot.services.parsers.base_parser import Parser
-from tgbot.services.parsers.models import HabrJob
+from tgbot.services.parsers.schemas import HabrJob
 
 
 class HabrParser(Parser):
