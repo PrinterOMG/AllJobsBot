@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from pydantic import BaseModel
 
@@ -38,6 +38,16 @@ class WeblancerJob(Job):
 
     marketplace = 'Weblancer'
     marketplace_url = 'https://www.weblancer.net/'
+
+
+class KWorkJob(Job):
+    expire_date: datetime
+    min_price: int
+    max_price: int
+    customer_url: str
+
+    marketplace = 'KWork'
+    marketplace_url = 'https://https://kwork.ru/'
 
 
 class InDevelopmentError(Exception):
