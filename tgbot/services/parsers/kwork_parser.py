@@ -95,7 +95,8 @@ class KWorkParser(Parser):
             min_price=int(job_dict['categoryMinPrice']),
             max_price=int(job_dict['possiblePriceLimit']),
             expire_date=datetime.datetime.strptime(job_dict['dateExpire'], '%Y-%m-%d %H:%M:%S'),
-            customer_url=cls.user_url + job_dict['userName']
+            customer_url=cls.user_url + job_dict['userName'],
+            views_count=10
         )
 
         return job

@@ -41,6 +41,7 @@ class HabrParser(Parser):
     @classmethod
     def _get_job_data(cls, job_html: Tag, url: str) -> HabrJob:
         title = job_html.find('h2').text.strip()
+        title = ' '.join(title.split())
         price = job_html.find('div', class_='task__finance').text.strip()
 
         task_meta = job_html.find('div', class_='task__meta')

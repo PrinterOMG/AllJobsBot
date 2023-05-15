@@ -41,7 +41,7 @@ class WeblancerParser(Parser):
                     return None
                 soup = BeautifulSoup(await response.text(), 'lxml')
 
-        job_html = soup.find('main', class_='content')
+        job_html = soup.find('main')
         return cls._get_job_data(job_html, url)
 
     @classmethod

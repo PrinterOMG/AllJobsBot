@@ -7,12 +7,16 @@ from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
 from aioredis import Redis
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
 
 from tgbot.config import load_config
 from tgbot import handlers
 from tgbot import filters
 from tgbot import middlewares
-
+from tgbot.services.database.base import Base
+from tgbot.services.parsers import parsers_dict
+from tgbot.services.schedulers import start_schedulers
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +47,18 @@ async def main():
     logger.info('Starting bot')
     config = load_config('.env')
 
+    engine = create_async_engine(
+        f'postgresql+asyncpg://{config.database.user}:{config.database.password}@'
+        f'{config.database.host}:{config.database.port}/{config.database.database}',
+        future=True
+    )
+    async with engine.begin() as conn:
+        # await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+    async_sessionmaker = sessionmaker(
+        engine, expire_on_commit=False, class_=AsyncSession
+    )
+
     bot = Bot(token=config.bot.token, parse_mode='HTML')
     bot_info = await bot.me
     logger.info(f'Bot: {bot_info.username} [{bot_info.mention}]')
@@ -53,10 +69,13 @@ async def main():
 
     bot['config'] = config
     bot['redis'] = redis
+    bot['database'] = async_sessionmaker
 
     register_all_middlewares(dp, config)
     register_all_filters(dp)
     register_all_handlers(dp)
+
+    asyncio.create_task(start_schedulers(bot, config, async_sessionmaker, redis, parsers_dict))
 
     try:
         await dp.start_polling()
