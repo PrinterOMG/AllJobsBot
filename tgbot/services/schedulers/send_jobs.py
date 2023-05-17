@@ -1,3 +1,5 @@
+import logging
+
 import aioredis
 from aiogram import Bot
 from sqlalchemy import select
@@ -8,11 +10,11 @@ from tgbot.services.database.models import User
 
 async def send_jobs(bot: Bot, parsers: dict, db, redis: aioredis):
     new_jobs = []
-    for parser in parsers.values():
+    for marketplace, parser in parsers.items():
         try:
             new_job = await parser.parse_last_job()
         except Exception as e:
-            print(e)
+            logging.error(f'Something wrong with {marketplace} parser: {e}')
             continue
         new_jobs.append(new_job)
 

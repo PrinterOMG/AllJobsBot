@@ -14,6 +14,11 @@ async def show_filters(call: CallbackQuery):
     async with db() as session:
         user = await session.get(User, call.from_user.id)
 
+        if user.tutorial.show_filters:
+            user.tutorial.show_filters = False
+            await call.answer(messages.filters_tutorial, show_alert=True)
+            await session.commit()
+
     await call.message.edit_text(
         text=messages.filters.format(status=user.has_filters, key_words=', '.join(user.filters.filter_words)),
         reply_markup=inline_keyboards.filters
@@ -26,6 +31,9 @@ async def clear_filters(call: CallbackQuery):
 
     async with db.begin() as session:
         user = await session.get(User, call.from_user.id)
+        if not user.filters.filter_words:
+            await call.answer()
+            return
         user.filters.filter_words = []
 
     await show_filters(call)

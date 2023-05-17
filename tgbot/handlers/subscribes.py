@@ -15,6 +15,11 @@ async def show_subscribes(call: CallbackQuery):
     async with db() as session:
         user = await session.get(User, call.from_user.id)
 
+        if user.tutorial.show_subscribes:
+            user.tutorial.show_subscribes = False
+            await call.answer(messages.subscribes_tutorial, show_alert=True)
+            await session.commit()
+
     subscribes_iter = (messages.subscribe_line.format(marketplace=md.hcode(parser), status=pretty_bool(parser in user.settings.subscribes)) for parser in parsers_dict)
     text = messages.subscribes.format(subscribes_list='\n\n'.join(subscribes_iter))
     await call.message.edit_text(text, reply_markup=inline_keyboards.get_subscribes_keyboard())
@@ -27,7 +32,7 @@ async def switch_subscribe(call: CallbackQuery, callback_data: dict):
 
     async with db.begin() as session:
         user = await session.get(User, call.from_user.id)
-        if marketplace is user.settings.subscribes:
+        if marketplace in user.settings.subscribes:
             user.settings.subscribes.remove(marketplace)
         else:
             user.settings.subscribes.append(marketplace)
