@@ -75,6 +75,7 @@ async def main():
     register_all_filters(dp)
     register_all_handlers(dp)
 
+    logging.getLogger('schedule').propagate = False
     asyncio.create_task(start_schedulers(bot, config, async_sessionmaker, redis, parsers_dict))
 
     try:

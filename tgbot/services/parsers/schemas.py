@@ -50,11 +50,12 @@ class FreelanceRuJob(Job):
     marketplace_url = 'https://freelance.ru/'
 
     def __str__(self):
-        premium_str = '- ⭐ Премиум ⭐'
+        premium_str = '⭐ Премиум ⭐\n' if self.is_premium else ""
         text = (
             f'Появился новый заказ на {self.marketplace}!\n\n'
             '―――――――――――――――――――\n\n'
-            f'Название: {self.title}{premium_str if self.is_premium else ""}\n\n'
+            f'{premium_str}'
+            f'Название: {self.title}\n\n'
             f'Заказчик: {self.customer_name}\n\n'
             f'💰 Цена: {self.price}\n\n'
             f'Описание: {self.description}\n\n'
