@@ -21,8 +21,8 @@ class HabrJob(Job):
     customer_url: str
     views_count: int
 
-    marketplace = 'Habr'
-    marketplace_url = 'https://freelance.habr.com/'
+    marketplace: str = 'Habr'
+    marketplace_url: str = 'https://freelance.habr.com/'
 
     def __str__(self):
         text = (
@@ -46,8 +46,8 @@ class FreelanceRuJob(Job):
     is_premium: bool
     views_count: int
 
-    marketplace = 'FreelanceRu'
-    marketplace_url = 'https://freelance.ru/'
+    marketplace: str = 'FreelanceRu'
+    marketplace_url: str = 'https://freelance.ru/'
 
     def __str__(self):
         premium_str = '⭐ Премиум ⭐\n' if self.is_premium else ""
@@ -72,8 +72,8 @@ class FreelanceRuJob(Job):
 class WeblancerJob(Job):
     views_count: int
 
-    marketplace = 'Weblancer'
-    marketplace_url = 'https://www.weblancer.net/'
+    marketplace: str = 'Weblancer'
+    marketplace_url: str = 'https://www.weblancer.net/'
 
     def __str__(self):
         text = (
@@ -98,8 +98,8 @@ class KWorkJob(Job):
     max_price: int
     customer_url: str
 
-    marketplace = 'KWork'
-    marketplace_url = 'https://https://kwork.ru/'
+    marketplace: str = 'KWork'
+    marketplace_url: str = 'https://https://kwork.ru/'
 
     def __str__(self):
         text = (
