@@ -41,6 +41,9 @@ async def send_jobs(bot: Bot, parsers: dict, db, redis: aioredis):
             if user.settings.include_filters and not user.filters.filter_job(job):
                 continue
 
-            await bot.send_message(chat_id=user.telegram_id, text=str(job),
-                                   reply_markup=inline_keyboards.get_job_keyboard(job.url),
-                                   disable_web_page_preview=True)
+            try:
+                await bot.send_message(chat_id=user.telegram_id, text=str(job),
+                                       reply_markup=inline_keyboards.get_job_keyboard(job.url),
+                                       disable_web_page_preview=True)
+            except Exception as e:
+                logging.error(f'Something wrong with user {user.telegram_id}: {e}')
