@@ -6,12 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
-Pipfile
-Pipfile.lock
+# PyCharm
+.idea
 
 test.py
-test.html
-TODO.md
 
 # Distribution / packaging
 .Python
@@ -109,8 +107,8 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+.env
 .venv
-*/.env
 env/
 venv/
 ENV/
@@ -134,5 +132,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-.idea/*
-.env

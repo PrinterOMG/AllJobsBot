@@ -1,8 +1,0 @@
-aiogram==2.22.1
-environs==9.5.0
-sqlalchemy==1.4.40
-aiohttp==3.8.1
-beautifulsoup4==4.11.1
-aioschedule~=0.5.2
-lxml==4.9.1
-psycopg2~=2.9.3
