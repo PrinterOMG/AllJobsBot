@@ -15,7 +15,6 @@ async def send_jobs(bot: Bot, parsers: dict, db, redis: aioredis):
             new_job = await parser.parse_last_job()
         except Exception as e:
             logging.error(f'Something wrong with {marketplace} parser: {str(e)}')
-            raise e
             continue
         new_jobs.append(new_job)
 
@@ -25,7 +24,7 @@ async def send_jobs(bot: Bot, parsers: dict, db, redis: aioredis):
 
     for user in users:
         for job in new_jobs:
-            if job.marketplace not in user.settings.subscribes:
+            if job is None or job.marketplace not in user.settings.subscribes:
                 continue
 
             marketplace_key = f'{user.telegram_id}:{job.marketplace}'
