@@ -25,6 +25,8 @@ services:
       - "../.env"
     networks:
     - tg_bot
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
     healthcheck:
       test: [ "CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
       interval: 10s
@@ -43,3 +45,6 @@ services:
 networks:
   tg_bot:
     driver: bridge
+
+volumes:
+  postgres_data:
