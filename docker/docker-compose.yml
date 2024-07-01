@@ -1,0 +1,45 @@
+version: '3.3'
+
+services:
+  bot:
+    container_name: all_jobs_bot_aiogram
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - "../.env"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+    - tg_bot
+
+  postgres:
+    container_name: all_jobs_bot_postgres
+    image: postgres:16
+    restart: unless-stopped
+    env_file:
+      - "../.env"
+    networks:
+    - tg_bot
+    healthcheck:
+      test: [ "CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+    networks:
+    - tg_bot
+
+
+networks:
+  tg_bot:
+    driver: bridge

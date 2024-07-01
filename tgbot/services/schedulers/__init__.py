@@ -3,11 +3,11 @@ import asyncio
 import aioschedule
 from aiogram import Bot
 
-from tgbot.config import Config
+from tgbot.config import Settings
 from tgbot.services.schedulers.send_jobs import send_jobs
 
 
-async def start_schedulers(bot: Bot, config: Config, db, redis, parsers):
+async def start_schedulers(bot: Bot, config: Settings, db, redis, parsers):
     aioschedule.every(10).seconds.do(send_jobs, bot, parsers, db, redis)
 
     while True:

@@ -1,52 +1,28 @@
-from dataclasses import dataclass
-
-from environs import Env
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-@dataclass
-class DatabaseConfig:
-    host: str
-    password: str
-    user: str
-    database: str
-    port: int
-
-
-@dataclass
-class TelegramBot:
-    token: str
-    admin_ids: list[int]
-    use_redis: bool
-
-
-@dataclass
-class Miscellaneous:
-    other_params: str = ''
-
-
-@dataclass
-class Config:
-    bot: TelegramBot
-    database: DatabaseConfig
-    misc: Miscellaneous
-
-
-def load_config(path: str = None):
-    env = Env()
-    env.read_env(path)
-
-    return Config(
-        bot=TelegramBot(
-            token=env.str('BOT_TOKEN'),
-            admin_ids=list(map(int, env.list('ADMINS'))),
-            use_redis=env.bool('USE_REDIS'),
-        ),
-        database=DatabaseConfig(
-            host=env.str('DB_HOST'),
-            password=env.str('DB_PASS'),
-            user=env.str('DB_USER'),
-            database=env.str('DB_NAME'),
-            port=env.int('DB_PORT')
-        ),
-        misc=Miscellaneous()
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file='.env',
+        env_file_encoding='utf-8',
+        frozen=True
     )
+
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str
+    POSTGRES_HOST: str = 'localhost'
+    POSTGRES_PORT: int = 5432
+
+    REDIS_HOST: str = 'localhost'
+    REDIS_PORT: int = 6379
+
+    TELEGRAM_BOT_TOKEN: str
+    ADMIN_IDS: list[int] = []
+
+    @property
+    def database_url(self):
+        return (
+            f'postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}'
+            f'@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}'
+        )

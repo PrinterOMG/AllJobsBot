@@ -93,7 +93,6 @@ class WeblancerJob(Job):
 
 
 class KWorkJob(Job):
-    expire_date: datetime
     min_price: int
     max_price: int
     customer_url: str
@@ -113,7 +112,6 @@ class KWorkJob(Job):
             f'Описание: {self.description}\n\n'
             f'Количество откликов: {self.requests_count}\n\n'
             f'⏳ Дата: {self.date}\n'
-            f'Дата завершения: {self.expire_date}\n\n'
             '―――――――――――――――――――'
         )
 

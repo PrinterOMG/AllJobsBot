@@ -1,8 +1,6 @@
-import asyncio
 import datetime
 
 import aiohttp
-from bs4 import BeautifulSoup, Tag
 
 from tgbot.services.parsers.base_parser import Parser
 from tgbot.services.parsers.schemas import InDevelopmentError, KWorkJob
@@ -11,8 +9,8 @@ from tgbot.services.parsers.schemas import InDevelopmentError, KWorkJob
 class KWorkParser(Parser):
     marketplace_name = 'KWork'
     marketplace_url = 'https://kwork.ru'
+    job_url = 'https://kwork.ru/projects/{job_id}/view'
     jobs_list_url = 'https://kwork.ru/projects'
-    user_url = 'https://kwork.ru/user/'
     api_payload = {
         'page': 1,
         'view': 0,
@@ -85,18 +83,16 @@ class KWorkParser(Parser):
 
         job_dict = data['data']['wants'][0]
         job = KWorkJob(
-            url=cls.marketplace_url + job_dict['url'],
+            url=cls.job_url.format(job_id=job_dict['id']),
             title=job_dict['name'],
             description=job_dict['description'],
-            date=datetime.datetime.strptime(job_dict['dateCreate'], '%Y-%m-%d %H:%M:%S'),
-            requests_count=job_dict['kworkCount'],
+            date=datetime.datetime.strptime(job_dict['date_create'], '%Y-%m-%d %H:%M:%S'),
+            requests_count=job_dict['kwork_count'],
             price=job_dict['priceLimit'] + '₽',
-            customer_name=job_dict['userName'],
-            min_price=int(job_dict['categoryMinPrice']),
+            customer_name=job_dict['user']['username'],
+            min_price=int(job_dict['getPriceThreshold']),
             max_price=int(job_dict['possiblePriceLimit']),
-            expire_date=datetime.datetime.strptime(job_dict['dateExpire'], '%Y-%m-%d %H:%M:%S'),
-            customer_url=cls.user_url + job_dict['userName'],
-            views_count=10
+            customer_url=job_dict['wantUserGetProfileUrl'],
         )
 
         return job

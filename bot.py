@@ -4,13 +4,11 @@ import os
 import datetime
 
 from aiogram import Bot, Dispatcher
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
 from aioredis import Redis
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
 
-from tgbot.config import load_config
+from tgbot.config import Settings
 from tgbot import handlers
 from tgbot import filters
 from tgbot import middlewares
@@ -21,8 +19,8 @@ from tgbot.services.schedulers import start_schedulers
 logger = logging.getLogger(__name__)
 
 
-def register_all_middlewares(dp, config):
-    dp.setup_middleware(middlewares.EnvironmentMiddleware(config=config))
+def register_all_middlewares(dp, settings):
+    dp.setup_middleware(middlewares.EnvironmentMiddleware(settings=settings))
     dp.setup_middleware(middlewares.ThrottlingMiddleware())
 
 
@@ -45,38 +43,35 @@ async def main():
         handlers=(logging.FileHandler(log_file), logging.StreamHandler())
     )
     logger.info('Starting bot')
-    config = load_config('.env')
 
-    engine = create_async_engine(
-        f'postgresql+asyncpg://{config.database.user}:{config.database.password}@'
-        f'{config.database.host}:{config.database.port}/{config.database.database}',
-        future=True
-    )
+    settings = Settings()
+
+    engine = create_async_engine(settings.database_url)
     async with engine.begin() as conn:
         # await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
-    async_sessionmaker = sessionmaker(
+    AsyncSessionLocal = async_sessionmaker(
         engine, expire_on_commit=False, class_=AsyncSession
     )
 
-    bot = Bot(token=config.bot.token, parse_mode='HTML')
+    bot = Bot(token=settings.TELEGRAM_BOT_TOKEN, parse_mode='HTML')
     bot_info = await bot.me
     logger.info(f'Bot: {bot_info.username} [{bot_info.mention}]')
 
-    storage = RedisStorage2() if config.bot.use_redis else MemoryStorage()
+    storage = RedisStorage2(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
     dp = Dispatcher(bot, storage=storage)
-    redis = Redis()
+    redis = Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT)
 
-    bot['config'] = config
+    bot['settings'] = settings
     bot['redis'] = redis
-    bot['database'] = async_sessionmaker
+    bot['database'] = AsyncSessionLocal
 
-    register_all_middlewares(dp, config)
+    register_all_middlewares(dp, settings)
     register_all_filters(dp)
     register_all_handlers(dp)
 
     logging.getLogger('schedule').propagate = False
-    asyncio.create_task(start_schedulers(bot, config, async_sessionmaker, redis, parsers_dict))
+    asyncio.create_task(start_schedulers(bot, settings, AsyncSessionLocal, redis, parsers_dict))
 
     try:
         await dp.start_polling()

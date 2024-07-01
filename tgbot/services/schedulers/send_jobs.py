@@ -14,7 +14,8 @@ async def send_jobs(bot: Bot, parsers: dict, db, redis: aioredis):
         try:
             new_job = await parser.parse_last_job()
         except Exception as e:
-            logging.error(f'Something wrong with {marketplace} parser: {e}')
+            logging.error(f'Something wrong with {marketplace} parser: {str(e)}')
+            raise e
             continue
         new_jobs.append(new_job)
 
